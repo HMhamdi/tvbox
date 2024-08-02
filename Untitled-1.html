@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TV Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+        .status-bar {
+            background-color: #222;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            z-index: 1000; /* Keep status bar above everything */
+        }
+        .status-bar .time,
+        .status-bar .battery {
+            margin: 0 15px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            width: 100%;
+            margin-top: 70px; /* Adjust margin-top to avoid overlap with status bar */
+            position: relative;
+            z-index: 100; /* Keep container above background */
+        }
+        .app {
+            background-color: rgba(51, 51, 51, 0.8); /* Semi-transparent background */
+            border: 1px solid #444;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 20px;
+            width: 300px;
+            height: 250px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+        .app:hover, .app:focus {
+            transform: scale(1.05);
+            background-color: #555;
+        }
+        .app img {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+        }
+        .app h3 {
+            margin: 10px 0 5px;
+        }
+        .app p {
+            color: #bbb;
+            margin: 0;
+        }
+        .app a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            color: white;
+            background-color: #ff5722;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .app a:hover, .app a:focus {
+            background-color: #e64a19;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Keep background behind everything */
+            background: url('https://example.com/polar-background.jpg') no-repeat center center/cover; /* Replace with actual image URL */
+            animation: backgroundMove 30s linear infinite;
+        }
+        .ball {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: url('https://example.com/ball-image.png') no-repeat center center/cover; /* Replace with actual image URL */
+            border-radius: 50%;
+            animation: moveBall 10s linear infinite;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            animation: moveShape 20s linear infinite;
+        }
+        .shape1 {
+            width: 50px;
+            height: 50px;
+            top: 10%;
+            left: 20%;
+        }
+        .shape2 {
+            width: 75px;
+            height: 75px;
+            top: 50%;
+            left: 60%;
+        }
+        .shape3 {
+            width: 100px;
+            height: 100px;
+            top: 70%;
+            left: 30%;
+        }
+        @keyframes moveBall {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(80vw, 0); }
+            50% { transform: translate(80vw, 80vh); }
+            75% { transform: translate(0, 80vh); }
+            100% { transform: translate(0, 0); }
+        }
+        @keyframes moveShape {
+            0% { transform: translate(0, 0); opacity: 1; }
+            25% { transform: translate(50vw, -10vh); opacity: 0.8; }
+            50% { transform: translate(30vw, 40vh); opacity: 0.6; }
+            75% { transform: translate(-20vw, 20vh); opacity: 0.4; }
+            100% { transform: translate(0, 0); opacity: 1; }
+        }
+        @keyframes backgroundMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+    </style>
+    <script>
+        let currentIndex = 0;
+
+        function updateTime() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'Africa/Cairo' };
+            const timeString = new Intl.DateTimeFormat('ar-EG', options).format(now);
+            document.querySelector('.time').textContent = timeString;
+        }
+
+        function updateBattery() {
+            // This is a placeholder. In a real application, you would get the battery status from the device.
+            const batteryLevel = Math.floor(Math.random() * 100) + 1;
+            document.querySelector('.battery').textContent = `الطاقة: ${batteryLevel}%`;
+        }
+
+        function handleKeyDown(event) {
+            const apps = document.querySelectorAll('.app');
+            apps[currentIndex].classList.remove('focused');
+
+            switch(event.key) {
+                case 'ArrowRight':
+                    currentIndex = (currentIndex + 1) % apps.length;
+                    break;
+                case 'ArrowLeft':
+                    currentIndex = (currentIndex - 1 + apps.length) % apps.length;
+                    break;
+                case 'Enter':
+                    apps[currentIndex].querySelector('a').click();
+                    break;
+                default:
+                    break;
+            }
+
+            apps[currentIndex].classList.add('focused');
+            apps[currentIndex].focus();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            updateBattery();
+            setInterval(updateTime, 1000);
+            setInterval(updateBattery, 30000); // Update battery every 30 seconds
+            
+            const apps = document.querySelectorAll('.app');
+            if (apps.length > 0) {
+                apps[currentIndex].classList.add('focused');
+                apps[currentIndex].focus();
+            }
+            
+            document.addEventListener('keydown', handleKeyDown);
+        });
+    </script>
+</head>
+<body>
+    <div class="status-bar">
+        <div class="time"></div>
+        <div class="battery"></div>
+    </div>
+    <div class="container">
+        <div class="app" tabindex="0">
+            <img src="data:image/png;base64,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" alt="برنامج الكوره">
+            <h3>برنامج الكوره</h3>
+            <p>مشاهدة أحدث المباريات والأخبار الرياضية.</p>
+            <a href="https://kooora.live-koora.live/">افتح البرنامج</a>
+        </div>
+        <div class="app" tabindex="0">
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e9/21/a8/e921a8d6-e8d0-fe53-b500-224ae8936e97/AppIcon_TikTok-0-0-1x_U007epad-0-0-0-85-220.png/1200x600wa.png" alt="تيك توك كوم">
+            <h3>تيك توك كوم</h3>
+            <p>استمتع بأحدث الفيديوهات القصيرة.</p>
+            <a href="https://www.tiktok.com/ar/">افتح البرنامج</a>
+        </div>
+        <div class="app" tabindex="0">
+            <img src="https://gate.khaleejy7.com/wp-content/uploads/2024/01/%D9%85%D8%A7%D9%8A-%D8%B3%D9%8A%D9%85%D8%A7-780x470.webp" alt="برنامج الأفلام">
+            <h3>برنامج الأفلام</h3>
+            <p>شاهد أحدث الأفلام والمسلسلات.</p>
+            <a href="https://wecima.show/">افتح البرنامج</a>
+        </div>
+        <div class="app" tabindex="0">
+            <img src="https://hmhamdi.github.io/hm8/hamdi.jpg" alt="تابع المطور">
+            <h3>تابع المطور</h3>
+            <p>برنامج المطور</p>
+            <a href="https://hmhamdi.github.io/hm8/">افتح البرنامج</a>
+        </div>
+    </div>
+    <div class="background"></div>
+    <div class="ball"></div>
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+</body>
+</html>
